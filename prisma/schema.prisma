@@ -1,0 +1,133 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Region {
+  region_id   Int      @id @default(autoincrement())
+  region_name String   @db.VarChar(255)
+  Stores      Store[]
+  UserPoints  UserPoint[]
+
+  @@map("regions")
+}
+
+model Store {
+  store_id   Int      @id @default(autoincrement())
+  store_name String   @db.VarChar(255)
+  owner_id   Int
+  address    String?  @db.VarChar(255)
+  region_id  Int
+  Region     Region   @relation(fields: [region_id], references: [region_id])
+  Missions   Mission[]
+  Reviews    Review[]
+
+  @@map("stores")
+}
+
+model Mission {
+  mission_id      Int      @id @default(autoincrement())
+  store_id        Int
+  mission_content String   @db.Text
+  review_left     Boolean? @default(false)
+  Store           Store    @relation(fields: [store_id], references: [store_id])
+  UserMissions    UserMission[]
+
+  @@map("missions")
+}
+
+model User {
+  user_id    Int      @id @default(autoincrement())
+  created_at DateTime? @db.DateTime(6)
+  FoodChoices FoodChoice[]
+  Reviews     Review[]
+  TermsAgreements TermsAgreement[]
+  UserDetails UserDetail[]
+
+  @@map("user")
+}
+
+model FoodChoice {
+  choice_id   Int      @id @default(autoincrement())
+  user_id     Int?
+  food_item   Json
+  User        User?    @relation(fields: [user_id], references: [user_id])
+
+  @@map("food_choices")
+}
+
+model Review {
+  review_id      Int      @id @default(autoincrement())
+  user_id        Int
+  store_id       Int
+  rating         Int?
+  review_content String?  @db.Text
+  created_at     DateTime @default(now()) @db.Timestamp(6)
+  User           User     @relation(fields: [user_id], references: [user_id])
+  Store          Store    @relation(fields: [store_id], references: [store_id])
+
+  @@map("reviews")
+}
+
+model TermsAgreement {
+  agreement_id          Int      @id @default(autoincrement())
+  user_id               Int?
+  all_agreed            Boolean
+  age_agreed            Boolean?
+  service_terms_agreed  Boolean
+  privacy_policy_agreed Boolean
+  location_agreed       Boolean?
+  marketing_agreed      Boolean?
+  User                  User?    @relation(fields: [user_id], references: [user_id])
+
+  @@map("terms_agreement")
+}
+
+model UserDetail {
+  details_id   Int      @id @default(autoincrement())
+  user_id      Int      @unique
+  phone_number String?  @db.VarChar(500)
+  name         String   @db.VarChar(255)
+  birthdate    String?  @db.VarChar(500)
+  gender       String?  @db.VarChar(50)
+  address      String?  @db.VarChar(255)
+  email        String   @db.VarChar(100)
+  User         User?    @relation(fields: [user_id], references: [user_id])
+  UserMissions UserMission[]
+  UserPoints   UserPoint[]
+
+  @@map("user_detail")
+}
+
+model UserMission {
+  user_mission_id Int            @id @default(autoincrement())
+  user_id         Int
+  mission_id      Int
+  mission_status  MissionStatus
+  completed_date  DateTime?      @db.Date
+  UserDetail      UserDetail     @relation(fields: [user_id], references: [user_id])
+  Mission         Mission        @relation(fields: [mission_id], references: [mission_id])
+
+  @@map("user_missions")
+}
+
+model UserPoint {
+  user_id                  Int
+  region_id                Int
+  points                   Int    @default(0)
+  total_missions_completed Int    @default(0)
+  UserDetail               UserDetail @relation(fields: [user_id], references: [user_id])
+  Region                   Region     @relation(fields: [region_id], references: [region_id])
+  @@id([user_id, region_id])
+
+  @@map("user_points")
+}
+
+enum MissionStatus {
+  in_process
+  done
+}
