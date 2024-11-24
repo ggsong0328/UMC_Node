@@ -1,21 +1,9 @@
-import userRepository, {
-  addNewMission,
-  addNewProcessMission,
-  addNewReview,
-  addNewStore,
-} from "../repositories/user.repository.js"; // userRepository 가져오기
-import {
-  bodyToUser,
-  bodyToTerms,
-  bodyToFood,
-  bodyToStore,
-  bodyToReview,
-  bodyToMission,
-  bodyToProcessMission,
-} from "../dtos/user.dto.js"; // DTO 가져오기
+import userRepository from "../repositories/user.repository.js"; // userRepository 가져오기
+import { bodyToUser, bodyToTerms } from "../dtos/user.dto.js"; // DTO 가져오기
 
 // 1. 사용자 추가 (회원가입)
 export const createUserInfo = async (userData) => {
+  console.log(userData);
   const formattedUserData = bodyToUser(userData); // DTO로 변환
   return await userRepository.addUser(formattedUserData); // 사용자를 추가하고 user_id 반환
 };
@@ -40,42 +28,6 @@ export const saveUserFoodPreferences = async (foodData, user_id) => {
 
   try {
     await userRepository.selectFood(foodItemString, user_id); // 수정된 방식으로 전달
-  } catch (err) {
-    throw err;
-  }
-};
-
-export const addStore = async (storeData) => {
-  const formattedStoreData = bodyToStore(storeData); //DTO로 변환
-  try {
-    await addNewStore(formattedStoreData);
-  } catch (err) {
-    throw err;
-  }
-};
-
-export const addReview = async (reviewData) => {
-  const formattedReviewData = bodyToReview(reviewData);
-  try {
-    await addNewReview(formattedReviewData);
-  } catch (err) {
-    throw err;
-  }
-};
-
-export const addMission = async (missionData) => {
-  const formattedMissionData = bodyToMission(missionData);
-  try {
-    await addNewMission(formattedMissionData);
-  } catch (err) {
-    throw err;
-  }
-};
-
-export const addProcessMission = async (processMissionData) => {
-  const formattedProcessMissionData = bodyToProcessMission(processMissionData);
-  try {
-    await addNewProcessMission(formattedProcessMissionData);
   } catch (err) {
     throw err;
   }

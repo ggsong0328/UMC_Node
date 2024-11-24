@@ -2,14 +2,25 @@ import dotenv from "dotenv";
 import cors from "cors";
 import express from "express";
 import {
-  addNewStoreInRegion,
-  addNewStoreMission,
-  addNewUserMission,
   handleSignUpFood,
   handleSignUpInfo,
   handleSignUpTerms,
-  writeStoreReview,
 } from "./controllers/user.controller.js";
+import {
+  addNewStoreInRegion,
+  getStoreReview,
+} from "./controllers/store.controller.js";
+import {
+  getUserReview,
+  writeStoreReview,
+} from "./controllers/review.controller.js";
+import {
+  addNewStoreMission,
+  addNewUserMission,
+  changeProcessToDone,
+  getStoreMission,
+  getUserMission,
+} from "./controllers/mission.controller.js";
 
 dotenv.config();
 
@@ -29,13 +40,17 @@ app.post("/auth/signUp/terms", handleSignUpTerms);
 app.post("/auth/signUp/info", handleSignUpInfo);
 app.post("/auth/signUp/foods", handleSignUpFood);
 
-app.post("/regions/:regionId/stores", addNewStoreInRegion);
+app.post("/stores/regions/:regionId", addNewStoreInRegion);
 
 app.post("/reviews/:storeId", writeStoreReview);
+app.get("/reviews/stores", getStoreReview);
+app.get("/reviews/users", getUserReview);
 
 app.post("/missions/add/:storeId", addNewStoreMission);
-
 app.post("/missions/:userId/process", addNewUserMission);
+app.get("/missions/stores", getStoreMission);
+app.get("/missions/users", getUserMission);
+app.patch("/missions/:userId/:missionId", changeProcessToDone);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
